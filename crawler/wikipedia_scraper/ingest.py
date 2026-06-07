@@ -16,7 +16,11 @@ MAX_PAGES = 100
 visited = set()
 
 queue = deque([
-    "Python (programming language)"
+    "Python_(programming_language)",
+    "Django_(web_framework)",
+    "FastAPI",
+    "Machine_learning",
+    "Database",
 ])
 
 
@@ -60,7 +64,7 @@ while queue and len(visited) < MAX_PAGES:
     save_page(page)
 
     links = list(page.links.keys())
-    for link in links[:20]:
+    for link in links[:15]:
         if link not in visited:
             queue.append(link)
 
