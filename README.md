@@ -12,13 +12,13 @@
                  + Indexes
                        |
                        v
-FastAPI Search API <----> TF-IDF Search Service
-       |
-       v
- Django Frontend
-       |
-       v
- Search Results UI
+    FastAPI Search API <----> TF-IDF Search Service
+           |
+           v
+    Django Frontend
+           |
+           v
+    Search Results UI
 
 # User Flow
 
@@ -41,3 +41,20 @@ Django Frontend
 * Backend Search API: FastAPI
 * Frontend: Django
 * Database: PostgreSQL
+
+# Step 1: Crawler
+* get the pages from wiki api
+
+    ` pip install wikipediaapi `
+# Step 2: Indexing
+* do pre processing (lowercase -> tokenize -> store)
+
+    ` pip install nltk `
+* build TF-IDf 
+
+    ` pip install scikit-learn `
+* search through the docs, rank on cosine similarity and get the title of doc with most similarity
+
+    ` python web framework `
+
+
