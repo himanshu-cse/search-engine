@@ -54,6 +54,5 @@ Django Frontend
     * "https://nlp.stanford.edu/IR-book/html/htmledition/irbook.html" - ch 1 & 6
     * "https://jalammar.github.io/illustrated-word2vec/"
 * search through the docs, rank on cosine similarity and get the title of doc with most similarity
-    * ` python web framework `
 
 
