@@ -44,17 +44,16 @@ Django Frontend
 
 # Step 1: Crawler
 * get the pages from wiki api
-
-    ` pip install wikipediaapi `
+    * ` pip install wikipediaapi `
 # Step 2: Indexing
 * do pre processing (lowercase -> tokenize -> store)
-
-    ` pip install nltk `
+    * ` pip install nltk `
+    * "https://www.nltk.org/book/ch03.html"
 * build TF-IDf 
-
-    ` pip install scikit-learn `
+    * ` pip install scikit-learn `
+    * "https://nlp.stanford.edu/IR-book/html/htmledition/irbook.html" - ch 1 & 6
+    * "https://jalammar.github.io/illustrated-word2vec/"
 * search through the docs, rank on cosine similarity and get the title of doc with most similarity
-
-    ` python web framework `
+    * ` python web framework `
 
 
