@@ -14,3 +14,11 @@ class Document(SQLModel, table=True):
     source: str = "wikipedia"
     content_length: int
     created_at: datetime = Field(default_factory=datetime.now)
+
+class SearchQuery(SQLModel, table=True):
+    __tablename__ = "search_queries"
+
+    id: int | None = Field(default=None, primary_key=True)
+    query: str
+    result_count: int
+    searched_at: datetime = Field(default_factory=datetime.now) 

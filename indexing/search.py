@@ -6,6 +6,10 @@ from indexing.db_reader import get_documents
 from indexing.preprocess import preprocess
 from indexing.build_vocabulary import build_vocabulary
 
+documents = get_documents()
+document_lookup = {str(doc.id): doc for doc in documents}
+
+
 with open("indexing/tfidf_index.json") as f:
     document_vectors = json.load(f)
 
@@ -45,21 +49,41 @@ def cosine_similarity(query_vector, document_vector):
     return (dot_product / (query_norm * document_norm))
 
 def search(query, top_k=10):
+    query_terms = set(preprocess(query))
     query_vector = query_tfidf(query)
     scores = []
     for doc_id, doc_vector in document_vectors.items():
         score = cosine_similarity(query_vector, doc_vector)
-        scores.append((doc_id, score))
+
+        title_terms = set(preprocess(document_lookup[doc_id].title))
+        matches = len(query_terms.intersection(title_terms))
+        score *= (1 + matches * 0.3)
+
+        if score > 0:
+            scores.append((doc_id, score))
 
     scores.sort(key=lambda x: x[1], reverse=True)
 
-    return scores[:top_k]
+    results = []
+    for doc_id, score in scores[:top_k]:
+        doc = document_lookup[doc_id]
+        results.append(
+            {
+                "id": doc.id,
+                "title": doc.title,
+                "url": doc.url,
+                "summary": (
+                    doc.summary[:200]
+                    if doc.summary
+                    else ""
+                ),
+                "score": round(score, 4)
+            }
+        )
+
+    return results
 
 if __name__ == "__main__":
-    documents = get_documents()
-    document_lookup = {str(doc.id): doc for doc in documents}
-
     results = search("python web framework")
-    for doc_id, score in results:
-        doc = document_lookup[doc_id]
-        print(doc.title, score)
+    for result in results:
+        print(result)

@@ -22,3 +22,6 @@ learning/
 
 # jsons
 *.json
+
+# api test
+api.http

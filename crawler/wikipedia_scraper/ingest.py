@@ -2,8 +2,8 @@ import wikipediaapi
 from collections import deque
 from sqlmodel import Session, select
 
-from db import engine
-from models import Document
+from database.db import engine
+from database.models import Document
 
 
 wiki = wikipediaapi.Wikipedia(

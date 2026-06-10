@@ -55,4 +55,6 @@ Django Frontend
     * "https://jalammar.github.io/illustrated-word2vec/"
 * search through the docs, rank on cosine similarity and get the title of doc with most similarity
 
+# Working on API FastAPI
+` pip install fastapi uvicorn `
 

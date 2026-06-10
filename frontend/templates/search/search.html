@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wikipedia Search Engine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        h1 {
+            text-align: center;
+            color: #202124;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+        }
+
+        .search-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #1a73e8;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .search-button:hover {
+            background: #1557b0;
+        }
+
+        .result {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+
+        .result-title a {
+            color: #1a0dab;
+            text-decoration: none;
+            font-size: 22px;
+        }
+
+        .result-title a:hover {
+            text-decoration: underline;
+        }
+
+        .result-url {
+            color: #188038;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .result-summary {
+            color: #4d5156;
+            line-height: 1.5;
+            margin-top: 10px;
+        }
+
+        .results-count {
+            color: #5f6368;
+            margin-bottom: 20px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Wikipedia Search Engine</h1>
+    <p><a href="/analytics"> View Analytics </a></p>
+    <form method="get" class="search-box">
+        <input class="search-input" type="text" name="q" value="{{ query }}" placeholder="Search...">
+        <button class="search-button" type="submit"> Search </button>
+    </form>
+
+    {% if query %}
+        <p class="results-count"> Found {{ results|length }} results for "<strong>{{ query }}</strong>" </p>
+    {% endif %}
+
+    {% for result in results %}
+        <div class="result">
+            <div class="result-title"> <a href="{{ result.url }}" target="_blank"> {{ result.title }} </a> </div>
+            <div class="result-url">{{ result.url }}</div>
+            <div class="result-summary">{{ result.summary }}</div>
+        </div>
+
+    {% empty %}
+
+        {% if query %}
+            <p>No results found.</p>
+        {% endif %}
+
+    {% endfor %}
+
+</body>
+</html>
