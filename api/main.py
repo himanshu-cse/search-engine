@@ -5,10 +5,10 @@ from api.analytics import log_search, get_analytics
 app = FastAPI()
 
 @app.get("/search")
-def search_document(q: str):
-    results = search(q)
-    log_search(q, len(results))
-    return results
+def search_document(q: str, page: int = 1):
+    search_response = search(q, page=page, page_size=10)
+    log_search(q, search_response["total_results"])
+    return search_response
 
 @app.get("/analytics")
 def analytics():

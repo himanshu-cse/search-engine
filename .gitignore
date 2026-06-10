@@ -25,3 +25,9 @@ learning/
 
 # api test
 api.http
+
+# text
+*.txt
+
+# outputs
+*.out

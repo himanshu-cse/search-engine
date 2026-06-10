@@ -78,6 +78,36 @@
             color: #5f6368;
             margin-bottom: 20px;
         }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 30px;
+        }
+
+        .page-btn {
+            padding: 8px 14px;
+            border: 1px solid #dcdcdc;
+            border-radius: 6px;
+            background: white;
+            color: #1a73e8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .page-btn:hover {
+            background: #f1f3f4;
+        }
+
+        .page-btn.active {
+            background: #1a73e8;
+            color: white;
+            border-color: #1a73e8;
+            pointer-events: none;
+        }
     </style>
 
 </head>
@@ -92,7 +122,8 @@
     </form>
 
     {% if query %}
-        <p class="results-count"> Found {{ results|length }} results for "<strong>{{ query }}</strong>" </p>
+        <p class="results-count"> Found {{ total_results }} results for "<strong>{{ query }}</strong>" </p>
+        <p class="results-count"> Page {{ page }} of {{ total_pages }}</p>
     {% endif %}
 
     {% for result in results %}
@@ -101,14 +132,38 @@
             <div class="result-url">{{ result.url }}</div>
             <div class="result-summary">{{ result.summary }}</div>
         </div>
-
     {% empty %}
-
         {% if query %}
             <p>No results found.</p>
         {% endif %}
-
     {% endfor %}
+
+    {% if total_pages > 1 %}
+        <div class="pagination">
+            
+            {% if page > 1 %}
+                <a href="/?q={{ query }}&page={{ page|add:'-1' }}" class="page-btn">
+                    &laquo; Previous
+                </a>
+            {% endif %}
+
+            {% for p in page_range %}
+                <a href="/?q={{ query }}&page={{ p }}"
+                class="page-btn {% if p == page %}active{% endif %}">
+                    {{ p }}
+                </a>
+            {% endfor %}
+
+            {% if page < total_pages %}
+                <a href="/?q={{ query }}&page={{ page|add:'1' }}" class="page-btn">
+                    Next &raquo;
+                </a>
+            {% endif %}
+
+        </div>
+    {% endif %}
+
+
 
 </body>
 </html>

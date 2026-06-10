@@ -1,6 +1,6 @@
 import json
 from collections import Counter
-from math import log, sqrt
+from math import log, sqrt, ceil
 
 from indexing.db_reader import get_documents
 from indexing.preprocess import preprocess
@@ -48,7 +48,7 @@ def cosine_similarity(query_vector, document_vector):
 
     return (dot_product / (query_norm * document_norm))
 
-def search(query, top_k=10):
+def search(query, page=1, page_size=10):
     query_terms = set(preprocess(query))
     query_vector = query_tfidf(query)
     scores = []
@@ -64,8 +64,12 @@ def search(query, top_k=10):
 
     scores.sort(key=lambda x: x[1], reverse=True)
 
+    total_pages = ceil(len(scores) / page_size)
+
     results = []
-    for doc_id, score in scores[:top_k]:
+    start = (page-1)*page_size
+    end = start + page_size
+    for doc_id, score in scores[start:end]:
         doc = document_lookup[doc_id]
         results.append(
             {
@@ -81,7 +85,12 @@ def search(query, top_k=10):
             }
         )
 
-    return results
+    return {
+        "results": results, 
+        "total_pages": total_pages,
+        "current_page": page,
+        "total_results": len(scores),
+    }
 
 if __name__ == "__main__":
     results = search("python web framework")
