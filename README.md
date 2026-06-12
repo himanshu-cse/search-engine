@@ -60,5 +60,8 @@ Django Frontend
 # Analytics Page
 
 # Pagination
--> we will use django rest framework pagination
+
+# Using BM25 instead of TFIDF and update search
+
+# Autocomplete by trie
 
