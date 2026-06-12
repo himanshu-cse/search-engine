@@ -17,7 +17,26 @@ def search_view(request):
         results = response.json()["results"]
         total_pages = response.json()["total_pages"]
         total_results = response.json()["total_results"]
-        page_range = range(1, int(total_pages) + 1)
+        pagination_pages = []
+
+        if int(total_pages) <= 7:
+            pagination_pages = range(1, int(total_pages) + 1)
+        else:
+            pagination_pages.append(1)
+
+            start = max(2, page - 2)
+            end = min(int(total_pages) - 1, page + 2)
+
+            if start > 2:
+                pagination_pages.append("...")
+
+            for p in range(start, end + 1):
+                pagination_pages.append(p)
+
+            if end < total_pages - 1:
+                pagination_pages.append("...")
+
+            pagination_pages.append(int(total_pages))
         
     return render(
         request, 
@@ -27,7 +46,7 @@ def search_view(request):
             "results": results, 
             "page": page, 
             "total_pages": total_pages,
-            "page_range": page_range,
+            "pagination_pages": pagination_pages,
             "total_results": total_results
         }
     )

@@ -108,6 +108,34 @@
             border-color: #1a73e8;
             pointer-events: none;
         }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+        }
+
+        #suggestions {
+            position: absolute;
+            width: 100%;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            z-index: 1000;
+        }
+
+        #suggestions {
+            border: none;
+        }
+
+        .suggestion-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .suggestion-item:hover {
+            background-color: #f1f3f4;
+        }
+
     </style>
 
 </head>
@@ -117,7 +145,10 @@
     <h1>Wikipedia Search Engine</h1>
     <p><a href="/analytics"> View Analytics </a></p>
     <form method="get" class="search-box">
-        <input class="search-input" type="text" name="q" value="{{ query }}" placeholder="Search...">
+        <div class="search-container">
+            <input id="search-input" class="search-input" type="text" name="q" value="{{ query }}" placeholder="Search..." autocomplete="off">
+            <div id="suggestions"></div>
+        </div>
         <button class="search-button" type="submit"> Search </button>
     </form>
 
@@ -140,30 +171,74 @@
 
     {% if total_pages > 1 %}
         <div class="pagination">
-            
-            {% if page > 1 %}
-                <a href="/?q={{ query }}&page={{ page|add:'-1' }}" class="page-btn">
-                    &laquo; Previous
-                </a>
-            {% endif %}
-
-            {% for p in page_range %}
-                <a href="/?q={{ query }}&page={{ p }}"
-                class="page-btn {% if p == page %}active{% endif %}">
-                    {{ p }}
-                </a>
+            {% for p in pagination_pages %}
+                {% if p == "..." %}
+                    <span class="page-btn">...</span>
+                {% else %}
+                    <a href="/?q={{ query }}&page={{ p }}"
+                    class="page-btn {% if p == page %}active{% endif %}">
+                        {{ p }}
+                    </a>
+                {% endif %}
             {% endfor %}
-
-            {% if page < total_pages %}
-                <a href="/?q={{ query }}&page={{ page|add:'1' }}" class="page-btn">
-                    Next &raquo;
-                </a>
-            {% endif %}
-
         </div>
     {% endif %}
 
+    <script>
+        const input = document.getElementById("search-input");
+        const suggestionBox = document.getElementById("suggestions");
 
+        let timeout;
+        input.addEventListener("input", function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(async function () {
+                //fetch autocomplete
+                try {
+                    const query = input.value.trim().split(/\s+/).pop();
+                    if(query.length < 2) {
+                        suggestionBox.innerHTML = "";
+                        return;
+                    }
+                    
+                    const response = await fetch(
+                        `http://127.0.0.1:8000/autocomplete?q=${encodeURIComponent(query)}`
+                    );
 
+                    if (!response.ok) {
+                        throw new Error("Autocomplete request failed");
+                    }
+        
+                    const suggestions = await response.json();
+                    console.log(suggestions);
+
+                    suggestionBox.innerHTML = "";
+                    suggestions.forEach(word => {
+                        const div = document.createElement("div");
+                        div.classList.add("suggestion-item");
+                        div.textContent = word;
+                        suggestionBox.appendChild(div);     
+                        
+                        div.addEventListener("click", function() {
+                            const words = input.value.trim().split(/\s+/);
+                            words.pop();
+                            words.push(word);
+                            input.value = words.join(" ");
+                            suggestionBox.innerHTML = ""
+                        });
+                    });
+                }
+                catch(error) {
+                    console.error(error);
+                }
+            }, 200); // waits 200ms before calling the api
+        });
+
+        document.addEventListener("click", function(event) {
+            if(!input.contains(event.target) && !suggestionBox.contains(event.target)) {
+                suggestionBox.innerHTML = "";
+            }
+        })
+
+    </script>
 </body>
 </html>
