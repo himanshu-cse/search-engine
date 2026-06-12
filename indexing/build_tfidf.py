@@ -35,10 +35,14 @@ def calculate_tfidf(tokens):
     return tfidf
 
 document_vectors = {}
-for doc in documents:
+for i, doc in enumerate(documents, start=1):
+    if(i%100 == 0):
+        print(f"Processed {i}/{len(documents)}.")
     tokens = preprocess(doc.content)
     tfidf_vector = calculate_tfidf(tokens)
     document_vectors[doc.id] = tfidf_vector
 
 with open("indexing/tfidf_index.json", "w") as f:
     json.dump(document_vectors, f)
+
+print(f"Build tfidf for {len(documents)} in indexing/tfidf_index.json")
