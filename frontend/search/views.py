@@ -6,18 +6,18 @@ from django.shortcuts import render
 def search_view(request):
     query = request.GET.get("q", "")
     page = int(request.GET.get("page", 1))
+    search_type = request.GET.get("type", "hybrid")
 
     results = []
     total_pages = 1
     total_results = 0
-    page_range = []
+    pagination_pages = []
 
     if query:
-        response = requests.get("http://127.0.0.1:8000/search", params={"q": query, "page": page})
+        response = requests.get("http://127.0.0.1:8000/search", params={"q": query, "page": page, "type": search_type})
         results = response.json()["results"]
         total_pages = response.json()["total_pages"]
         total_results = response.json()["total_results"]
-        pagination_pages = []
 
         if int(total_pages) <= 7:
             pagination_pages = range(1, int(total_pages) + 1)
@@ -47,7 +47,8 @@ def search_view(request):
             "page": page, 
             "total_pages": total_pages,
             "pagination_pages": pagination_pages,
-            "total_results": total_results
+            "total_results": total_results,
+            "search_type": search_type
         }
     )
 

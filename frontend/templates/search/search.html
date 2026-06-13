@@ -136,6 +136,11 @@
             background-color: #f1f3f4;
         }
 
+        .search-type {
+            background-color: #f1f3f4;
+            border-radius: 8px;
+        }
+
     </style>
 
 </head>
@@ -149,6 +154,11 @@
             <input id="search-input" class="search-input" type="text" name="q" value="{{ query }}" placeholder="Search..." autocomplete="off">
             <div id="suggestions"></div>
         </div>
+        <select name="type" class="search-type">
+            <option value="hybrid" {% if search_type == "hybrid" %}selected{% endif %}>Hybrid</option>
+            <option value="bm25" {% if search_type == "bm25" %}selected{% endif %}>BM25</option>
+            <option value="semantic" {% if search_type == "semantic" %}selected{% endif %}>Semantic</option>
+        </select>
         <button class="search-button" type="submit"> Search </button>
     </form>
 
@@ -175,7 +185,7 @@
                 {% if p == "..." %}
                     <span class="page-btn">...</span>
                 {% else %}
-                    <a href="/?q={{ query }}&page={{ p }}"
+                    <a href="/?q={{ query }}&page={{ p }}&type={{ search_type }}"
                     class="page-btn {% if p == page %}active{% endif %}">
                         {{ p }}
                     </a>

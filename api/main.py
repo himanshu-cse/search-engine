@@ -1,5 +1,7 @@
 from fastapi import FastAPI
-from indexing.search import search
+from indexing.search import bm25_search
+from indexing.semantic_search import semantic_search
+from indexing.hybrid_search import hybrid_search
 from indexing.autocomplete import autocomplete
 from api.analytics import log_search, get_analytics
 from fastapi.middleware.cors import CORSMiddleware 
@@ -21,8 +23,13 @@ app.add_middleware(
 )
 
 @app.get("/search")
-def search_document(q: str, page: int = 1):
-    search_response = search(q, page=page, page_size=10)
+def search_document(q: str, page: int = 1, type: str = "hybrid"):
+    if type == "bm25":
+        search_response = bm25_search(q, page=page, page_size=10)
+    elif type == "semantic":
+        search_response = semantic_search(q, page=page, page_size=10)
+    else:
+        search_response = hybrid_search(q, page=page, page_size=10)
     log_search(q, search_response["total_results"])
     return search_response
 

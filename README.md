@@ -65,3 +65,5 @@ Django Frontend
 
 # Autocomplete by trie
 
+# Update Search by sentence transformers
+` pip install sentence-transformers `

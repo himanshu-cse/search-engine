@@ -1,5 +1,6 @@
 import json
-from math import ceil
+from math import log, sqrt, ceil
+from sentence_transformers import SentenceTransformer
 
 from indexing.preprocess import preprocess
 from indexing.db_reader import get_documents
@@ -11,8 +12,25 @@ document_lookup = {str(doc.id): doc for doc in documents}
 with open("indexing/inverted_index.json") as f:
     inverted_index = json.load(f)
 
-def bm25_search(query, page=1, page_size=10):
+model = SentenceTransformer("all-MiniLM-L6-v2")
+
+with open("indexing/document_embeddings.json", "r") as f:
+    document_embeddings = json.load(f)
+
+def cosine_similarity(v1, v2):
+    dot = sum(a*b for a,b in zip(v1,v2))
+
+    norm1 = sqrt(sum(x*x for x in v1))
+    norm2 = sqrt(sum(x*x for x in v2))
+
+    if norm1 == 0 or norm2 == 0:
+        return 0
+
+    return float(dot / (norm1 * norm2))
+
+def hybrid_search(query, page=1, page_size=10):
     query_terms = preprocess(query)
+    query_embedding = model.encode(query, normalize_embeddings=True)
 
     candidate_docs = set()
     for term in query_terms:
@@ -22,7 +40,13 @@ def bm25_search(query, page=1, page_size=10):
 
     scores = []
     for doc_id in candidate_docs:
-        score = bm25_score(query_terms,doc_id)
+        if str(doc_id) not in document_embeddings:
+            continue
+        bm25 = bm25_score(query_terms,doc_id)
+        bm25_sc = bm25 / (bm25+1) # normalize so its doesnt completely dominate hybrid
+        semantic_sc = cosine_similarity(query_embedding, document_embeddings[str(doc_id)])
+
+        score = 0.7 * bm25_sc + 0.3 * semantic_sc   # score 0 -> 1
 
         # title boost
         title_terms = preprocess(document_lookup[str(doc_id)].title)
@@ -47,7 +71,7 @@ def bm25_search(query, page=1, page_size=10):
                 "title": doc.title,
                 "url": doc.url,
                 "summary": (doc.summary[:200] if doc.summary else ""),
-                "score": round(score, 4)
+                "score": float(round(score, 4))
             }
         )
 
@@ -56,4 +80,5 @@ def bm25_search(query, page=1, page_size=10):
         "total_pages": total_pages,
         "current_page": page,
         "total_results": len(scores),
-    }
+    }    
+    
